@@ -59,8 +59,8 @@ def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
                 train_epoch_losses.append(epoch_loss)
             else:
                 val_epoch_losses.append(epoch_loss)
-                logging.info('\t{} loss: {:.4f}, {} accuracy: {:.4f}'.format(
-                    phase, epoch_loss, phase, epoch_accuracy))
+            logging.info('\t{} loss: {:.4f}, {} accuracy: {:.4f}'.format(
+                phase, epoch_loss, phase, epoch_accuracy))
 
             if phase == 'val' and epoch_accuracy > best_accuracy:
                 best_accuracy = epoch_accuracy
