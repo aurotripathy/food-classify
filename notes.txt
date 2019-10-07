@@ -1,1 +1,4 @@
 ulimit -s 65536
+
+dropouts ?
+regularization ?
