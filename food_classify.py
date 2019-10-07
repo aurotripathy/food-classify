@@ -96,13 +96,12 @@ def configure_run_model():
     criterion = nn.CrossEntropyLoss()
     model = models.resnet101(pretrained=True)  # pretrained=True will download its weights
     num_in_features_last = model.fc.in_features
-    for param in model.parameters():
-        param.requires_grad = False
+
     # Newly constructed module has requires_grad=True by default
     model.fc = nn.Linear(num_in_features_last, nb_classes)
 
     # Note, only parameters of final layer are being optimized
-    optimizer = optim.SGD(model.fc.parameters(), lr=0.001, momentum=0.9)
+    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
     model = torch.nn.DataParallel(model, device_ids=[0,1,2,3,4,5,6,7])
 
@@ -123,7 +122,8 @@ def get_args():
     return parser.parse_args()
 
 
-logging.basicConfig(filename='training.log', level=logging.INFO, filemode='w', format='%(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='training.log', level=logging.INFO,
+                    filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
 args = get_args()
 
