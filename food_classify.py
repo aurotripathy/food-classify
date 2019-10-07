@@ -16,6 +16,7 @@ import copy
 from utils import show_batch, load_data, display_losses
 from pudb import set_trace
 import argparse
+import logging
 
 def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
 
@@ -24,7 +25,7 @@ def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
     train_epoch_losses = []
     val_epoch_losses = []
     for epoch in range(num_epochs):
-        print('\nEpoch {}/{}'.format(epoch, num_epochs - 1))
+        logging.info('\nEpoch {}/{}'.format(epoch, num_epochs - 1))
         
         for phase in ['train', 'val']:  # each epoch does train and validate
             model.train() if phase == 'train' else model.eval()
@@ -34,8 +35,6 @@ def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
 
             # Iterate over mini-batches
             for inputs, labels in dataloaders[phase]:
-                # print("Iterating over mini batch")
-                set_trace()
                 inputs = inputs.to(device)
                 labels = labels.to(device)
 
@@ -60,7 +59,7 @@ def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
                 train_epoch_losses.append(epoch_loss)
             else:
                 val_epoch_losses.append(epoch_loss)
-                print('\t{} loss: {:.4f}, {} accuracy: {:.4f}'.format(
+                logging.info('\t{} loss: {:.4f}, {} accuracy: {:.4f}'.format(
                     phase, epoch_loss, phase, epoch_accuracy))
 
             if phase == 'val' and epoch_accuracy > best_accuracy:
@@ -70,8 +69,9 @@ def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
             if phase == 'train':
                 scheduler.step()
 
-    print('Best validation accuracy: {:4f}'.format(best_accuracy))
+    logging.info('Best validation accuracy: {:4f}'.format(best_accuracy))
     model.load_state_dict(best_model_weights)  # retain best weights
+    torch.save(best_model_weights, './trained_model')
     return model, train_epoch_losses, val_epoch_losses
 
 
@@ -88,7 +88,7 @@ def test_model(model):
             _, predictions = torch.max(outputs, 1)  # predictions == argmax
             running_corrects += torch.sum(predictions == labels.data)
             acc = running_corrects.double() / dataset_sizes['test']
-        print('Test accuracy: {:.4f}'.format(acc))
+        logging.info('Test accuracy: {:.4f}'.format(acc))
 
 
 def configure_run_model():
@@ -123,15 +123,15 @@ def get_args():
     return parser.parse_args()
 
 
-set_trace()
+logging.basicConfig(filename='training.log', level=logging.INFO, filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
 args = get_args()
 
 dataloaders, dataset_sizes, class_names = load_data('./../food-101/train_val_test/', args.batch_size)
-print('Train size {}, Val size {}, Test size {}'.format(dataset_sizes['train'],
+logging.info('Train size {}, Val size {}, Test size {}'.format(dataset_sizes['train'],
                                                         dataset_sizes['val'],
 							dataset_sizes['test']))
-print('Class names:{}'.format(class_names))
+logging.info('Class names:{}'.format(class_names))
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 nb_classes = len(class_names)
 # Get a batch of training data and show it
