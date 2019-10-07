@@ -2,3 +2,6 @@ ulimit -s 65536
 
 dropouts ?
 regularization ?
+
+fine-tune from resnext101
+https://github.com/banjuanshua/pytorch-finetune-example/blob/master/main.py
