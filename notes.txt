@@ -15,3 +15,7 @@ http://www.telesens.co/2018/06/28/data-augmentation-in-ssd/#Photometric_Distorti
 
 try ideas from here (extending the network w/ bn)
 https://github.com/stratospark/food-101-keras/blob/master/food.py
+
+for eval, 
+try multicrop (10 crops and pick the highest occurring)
+multi-scale
