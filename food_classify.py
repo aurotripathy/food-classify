@@ -65,13 +65,13 @@ def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
             if phase == 'val' and epoch_accuracy > best_accuracy:
                 best_accuracy = epoch_accuracy
                 best_model_weights = copy.deepcopy(model.state_dict())
-
+                torch.save(best_model_weights, './trained_model/checkpoint.pth')
+    
             if phase == 'train':
                 scheduler.step()
 
     logging.info('Best validation accuracy: {:4f}'.format(best_accuracy))
     model.load_state_dict(best_model_weights)  # retain best weights
-    torch.save(best_model_weights, './trained_model')
     return model, train_epoch_losses, val_epoch_losses
 
 
@@ -100,15 +100,15 @@ def configure_run_model():
     # Newly constructed module has requires_grad=True by default
     model.fc = nn.Linear(num_in_features_last, nb_classes)
 
-    # Note, only parameters of final layer are being optimized
-    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+    # Optimize all paramters
+    optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
 
     model = torch.nn.DataParallel(model, device_ids=[0,1,2,3,4,5,6,7])
 
     model = model.to(device)
 
     # Decay learning rate by a factor of 0.1 every 7 epochs
-    exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
+    exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
     model = train_val_model(model, criterion, optimizer, exp_lr_scheduler, args.epochs)
     return model
@@ -117,7 +117,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--batch-size" , type=int, required=False, default=64,
                         help="Batch size (will be split among devices used by this invocation)")
-    parser.add_argument("--epochs", type=int, required=False, default=20,
+    parser.add_argument("--epochs", type=int, required=False, default=100,
                         help="Epochs")
     return parser.parse_args()
 
