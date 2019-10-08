@@ -107,7 +107,7 @@ def configure_run_model():
 
     model = model.to(device)
 
-    # Decay learning rate by a factor of 0.1 every 7 epochs
+    # Decay learning rate by a factor of 0.1 every step_size epochs
     exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
     model = train_val_model(model, criterion, optimizer, exp_lr_scheduler, args.epochs)
