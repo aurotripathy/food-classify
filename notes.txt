@@ -12,3 +12,6 @@ https://pypi.org/project/timm/
 photometric distortions
 https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Object-Detection/blob/master/utils.py
 http://www.telesens.co/2018/06/28/data-augmentation-in-ssd/#Photometric_Distortions
+
+try ideas from here (extending the network w/ bn)
+https://github.com/stratospark/food-101-keras/blob/master/food.py
