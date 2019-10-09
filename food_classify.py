@@ -17,6 +17,7 @@ from utils import show_batch, load_data, display_losses
 from pudb import set_trace
 import argparse
 import logging
+import numpy as np
 
 def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
 
@@ -103,7 +104,9 @@ def configure_run_model():
     # Optimize all paramters
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
 
-    model = torch.nn.DataParallel(model, device_ids=[0,1,2,3,4,5,6,7])
+    if multi_gpu:
+        # model = torch.nn.DataParallel(model, device_ids=gpu_list)
+        model = torch.nn.DataParallel(model, device_ids=[0,1,2,3,4])
 
     model = model.to(device)
 
@@ -115,6 +118,8 @@ def configure_run_model():
 
 def get_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--train-data" , type=str, required=True, 
+                        help="Path to the training data (in PyTorch ImageFolder format)")
     parser.add_argument("--batch-size" , type=int, required=False, default=64,
                         help="Batch size (will be split among devices used by this invocation)")
     parser.add_argument("--epochs", type=int, required=False, default=100,
@@ -126,13 +131,27 @@ logging.basicConfig(filename='training.log', level=logging.INFO,
                     filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
 args = get_args()
+logging.info(args)
 
-dataloaders, dataset_sizes, class_names = load_data('./../food-101/train_val_test/', args.batch_size)
+# './../../data/food-101/food-101/train_val_test/'
+dataloaders, dataset_sizes, class_names = load_data(args.train_data, args.batch_size)
 logging.info('Train size {}, Val size {}, Test size {}'.format(dataset_sizes['train'],
                                                         dataset_sizes['val'],
 							dataset_sizes['test']))
 logging.info('Class names:{}'.format(class_names))
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+if torch.cuda.is_available():
+    total_gpus = torch.cuda.device_count()
+    logging.info('Total number of GPUs:{}'.format(total_gpus))
+    if total_gpus == 1:
+        multi_gpu = False
+    elif total_gpus > 1:
+        multi_gpu = True
+        gpu_list = list(np.arange(total_gpus))
+else:
+    print("No GPUs, Cannot proceed. This training regime needs GPUs.")
+    exit(1)
+
 nb_classes = len(class_names)
 # Get a batch of training data and show it
 inputs, classes = next(iter(dataloaders['train']))
