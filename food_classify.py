@@ -26,6 +26,7 @@ def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
     val_epoch_losses = []
     for epoch in range(num_epochs):
         logging.info('\nEpoch {}/{}'.format(epoch, num_epochs - 1))
+        logging.info('Learning rate {}'.format(scheduler.get_lr()))
         
         for phase in ['train', 'val']:  # each epoch does train and validate
             model.train() if phase == 'train' else model.eval()
