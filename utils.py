@@ -3,6 +3,7 @@ import torch
 from torchvision import datasets, transforms
 import os
 import numpy as np
+from datetime import date
 from pudb import set_trace
 
 def display_losses(train_losses, val_losses, title, folder='plots'):
@@ -78,3 +79,8 @@ def load_data(data_dir, batch_size):
     return dataloaders, dataset_sizes, class_names
 
 
+def get_logfilename_with_datetime():
+    # Use current date/time (upto minute) to get a text file name.
+    return "train_log-" + \
+        str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M")) + \
+        ".log"

@@ -11,6 +11,7 @@ import sys
 from sys import exit
 from os.path import join, basename, dirname, exists
 from pudb import set_trace
+import argparse
 
 def copy_files(source_filenames, dest_path):
     for source_file in source_filenames:
@@ -59,7 +60,13 @@ def create_train_val_test(folder):
             copy_files(filenames, path)
 
 set_trace()
-root_folder = '/food-101/food-101/'
+parser = argparse.ArgumentParser()
+parser.add_argument("--root-folder" , type=str, required=True, 
+                    help="Path to the downlaoded images")
+args = get_args()
+
+# root folder '../../data/food-101/food-101/'
+root_folder = args.root_folder
 images_folder = join(root_folder, 'images')
 train_val_test_folder = join(root_folder, 'train_val_test')
 # Create a new output each time
