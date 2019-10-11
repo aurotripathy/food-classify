@@ -14,10 +14,12 @@ import torchvision
 from torchvision import models
 import copy
 from utils import show_batch, load_data, display_losses
+from utils import get_logfilename_with_datetime
 from pudb import set_trace
 import argparse
 import logging
 import numpy as np
+fron os.path import join
 
 def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
 
@@ -126,8 +128,10 @@ def get_args():
                         help="Epochs")
     return parser.parse_args()
 
-
-logging.basicConfig(filename='training.log', level=logging.INFO,
+log_folder = 'log'
+log_file = get_logfilename_with_datetime()
+logging.basicConfig(filename=join(log_folder, log_file),
+                    level=logging.INFO,
                     filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
 args = get_args()
