@@ -18,7 +18,7 @@ class SliceBranch(torch.nn.Module):
     """ 2D convolution with three inputs, two outputs """ 
     def __init__(self, input_size, output_size):
         super(SliceBranch, self).__init__()
-        kernel_size = (224, 5)  # 3 by 3
+        kernel_size = (224, 5)  # 
         self.conv = torch.nn.Conv2d(input_size,
                                     output_size,
                                     kernel_size,
@@ -51,19 +51,25 @@ class TwoInputsNet(torch.nn.Module):
     self.slice_branch = SliceBranch(3,320)
     self.res50_model = models.resnet50(pretrained=True)
     self.res50_features = torch.nn.Sequential(*list(self.res50_model.children())[:-1])
+    print('Trucncated Resnet\n', self.res50_features)
 
-    self.fc1 = torch.nn.Linear(640 + 320, 2048)  
+    self.fc1 = torch.nn.Linear(2368, 2048)  
     self.fc2 = torch.nn.Linear(2048, 2048)  
 
   def forward(self, x):
     s_b = self.slice_branch(x)
+    print('s_b', s_b.shape)
     resnet50 = self.res50_features(x)
-    out = torch.cat(s_b, resnet50)    
-
+    print('resnet50', resnet50.shape)
+    out = torch.cat([s_b, resnet50], dim=1)    
+    print('concat out\n', out.shape)
+    out = torch.flatten(out, 1)
+    out = self.fc1(out)
+    out = self.fc2(out)
     return out
 
 
 # set_trace()
 model = TwoInputsNet()
-
+reult = model(input)
 
