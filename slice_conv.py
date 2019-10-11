@@ -52,8 +52,8 @@ class TwoInputsNet(torch.nn.Module):
     self.res50_model = models.resnet50(pretrained=True)
     self.res50_features = torch.nn.Sequential(*list(self.res50_model.children())[:-1])
 
-    # self.fc1 = torch.nn.Linear(640 + 320, 2048)  # set up first FC layer
-    # self.fc2 = torch.nn.Linear(2048, 2048)  # set up the other FC layer
+    self.fc1 = torch.nn.Linear(640 + 320, 2048)  
+    self.fc2 = torch.nn.Linear(2048, 2048)  
 
   def forward(self, x):
     s_b = self.slice_branch(x)
