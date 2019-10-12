@@ -70,8 +70,8 @@ def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
             if phase == 'val' and epoch_accuracy > best_accuracy:
                 best_accuracy = epoch_accuracy
                 best_model_weights = copy.deepcopy(model.state_dict())
-                torch.save(best_model_weights, './trained_model/checkpoint.pth')
-    
+                torch.save(best_model_weights, join(args.trained_models_folder, 'checkpoint.pth'))
+
             if phase == 'train':
                 scheduler.step()
 
@@ -109,8 +109,10 @@ def configure_run_model():
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
 
     if multi_gpu:
-        # model = torch.nn.DataParallel(model, device_ids=gpu_list)
-        model = torch.nn.DataParallel(model, device_ids=[0,1,2,3,4])
+        set_trace()
+        logging.info("Using {} GPUs.".format(torch.cuda.device_count()))
+        model = torch.nn.DataParallel(model)
+        # model = torch.nn.DataParallel(model, device_ids=[0,1,2])
 
     model = model.to(device)
 
@@ -128,24 +130,33 @@ def get_args():
                         help="Batch size (will be split among devices used by this invocation)")
     parser.add_argument("--epochs", type=int, required=False, default=100,
                         help="Epochs")
+    parser.add_argument("--log-folder", type=str, required=False, default='logs',
+                        help="Location of logs")
+    parser.add_argument("--trained-models-folder", type=str, required=False,
+                        default="trained_models",
+                        help="Location of models")
+    
     return parser.parse_args()
 
-log_folder = 'log'
-if not os.path.exists(log_folder):
-    os.makedirs(log_folder)
+args = get_args()
+if not os.path.exists(args.log_folder):
+    os.makedirs(args.log_folder)
+if not os.path.exists(args.trained_models_folder):
+    os.makedirs(args.trained_models_folder)
 log_file = get_logfilename_with_datetime()
-logging.basicConfig(filename=join(log_folder, log_file),
+logging.basicConfig(filename=join(args.log_folder, log_file),
                     level=logging.INFO,
                     filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
-args = get_args()
+
+print(args)
 logging.info(args)
 
 # './../../data/food-101/food-101/train_val_test/'
 dataloaders, dataset_sizes, class_names = load_data(args.train_data, args.batch_size)
 logging.info('Train size {}, Val size {}, Test size {}'.format(dataset_sizes['train'],
-                                                        dataset_sizes['val'],
-							dataset_sizes['test']))
+                                                               dataset_sizes['val'],
+                                                               dataset_sizes['test']))
 logging.info('Class names:{}'.format(class_names))
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 if torch.cuda.is_available():
