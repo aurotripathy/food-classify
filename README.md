@@ -5,3 +5,6 @@ sudo docker run -it --network=host --shm-size=20G --device=/dev/kfd --device=/de
 
 #### First, build the dataset
 python build_dataset.py --root-folder /media/auro/RAID\ 5/food-101/food-101
+
+#### Then run the training regime
+python train_val.py --batch-size 75 --epochs 15 --train-data /media/auro/RAID\ 5/food-101/food-101/train_val_test
