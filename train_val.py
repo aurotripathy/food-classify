@@ -11,7 +11,6 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.optim import lr_scheduler
 import torchvision
-from torchvision import models
 import copy
 from utils import show_batch, load_data, display_losses
 from utils import get_logfilename_with_datetime
@@ -19,7 +18,9 @@ from pudb import set_trace
 import argparse
 import logging
 import numpy as np
+import os
 from os.path import join
+from models import get_model
 
 def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
 
@@ -98,7 +99,7 @@ def test_model(model):
 def configure_run_model():
 
     criterion = nn.CrossEntropyLoss()
-    model = models.resnet101(pretrained=True)  # pretrained=True will download its weights
+    model = get_model()
     num_in_features_last = model.fc.in_features
 
     # Newly constructed module has requires_grad=True by default
@@ -130,6 +131,8 @@ def get_args():
     return parser.parse_args()
 
 log_folder = 'log'
+if not os.path.exists(log_folder):
+    os.makedirs(log_folder)
 log_file = get_logfilename_with_datetime()
 logging.basicConfig(filename=join(log_folder, log_file),
                     level=logging.INFO,
