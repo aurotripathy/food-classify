@@ -62,8 +62,8 @@ def create_train_val_test(folder):
 set_trace()
 parser = argparse.ArgumentParser()
 parser.add_argument("--root-folder" , type=str, required=True, 
-                    help="Path to the downlaoded images")
-args = get_args()
+                    help="Path to the downloaded images")
+args = parser.parse_args()
 
 # root folder '../../data/food-101/food-101/'
 root_folder = args.root_folder
