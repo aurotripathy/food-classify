@@ -3,7 +3,7 @@ import torch
 from torchvision import datasets, transforms
 import os
 import numpy as np
-from datetime import date
+import datetime
 from pudb import set_trace
 
 def display_losses(train_losses, val_losses, title, folder='plots'):
