@@ -46,7 +46,7 @@ class SliceBranch(torch.nn.Module):
 
 
 class TwoInputsNet(torch.nn.Module):
-  def __init__(self):
+  def __init__(self, nb_classes):
     super(TwoInputsNet, self).__init__()
     self.slice_branch = SliceBranch(3,320)
     self.res50_model = models.resnet50(pretrained=True)
@@ -54,7 +54,7 @@ class TwoInputsNet(torch.nn.Module):
     print('Trucncated Resnet\n', self.res50_features)
 
     self.fc1 = torch.nn.Linear(2368, 2048)  
-    self.fc2 = torch.nn.Linear(2048, 2048)  
+    self.fc2 = torch.nn.Linear(2048, nb_classes)  
 
   def forward(self, x):
     s_b = self.slice_branch(x)
@@ -65,11 +65,13 @@ class TwoInputsNet(torch.nn.Module):
     print('concat out\n', out.shape)
     out = torch.flatten(out, 1)
     out = self.fc1(out)
+    print('fc1 out\n', out.shape)
     out = self.fc2(out)
+    print('fc2 out\n', out.shape)
     return out
 
 
 # set_trace()
-model = TwoInputsNet()
+model = TwoInputsNet(101)
 reult = model(input)
 
