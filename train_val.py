@@ -152,9 +152,8 @@ logging.basicConfig(filename=join(args.log_folder, log_file),
 print(args)
 logging.info(args)
 
-# './../../data/food-101/food-101/train_val_test/'
 dataloaders, dataset_sizes, class_names = load_data(args.train_data, args.batch_size)
-logging.info('Train size {}, Val size {}, Test size {}'.format(dataset_sizes['train'],
+logging.info("Train size {}, Val size {}, Test size {}".format(dataset_sizes['train'],
                                                                dataset_sizes['val'],
                                                                dataset_sizes['test']))
 logging.info('Class names:{}'.format(class_names))
@@ -166,7 +165,7 @@ if torch.cuda.is_available():
         multi_gpu = False
     elif total_gpus > 1:
         multi_gpu = True
-        gpu_list = list(np.arange(total_gpus))
+
 else:
     print("No GPUs, Cannot proceed. This training regime needs GPUs.")
     exit(1)
@@ -178,10 +177,6 @@ out = torchvision.utils.make_grid(inputs)
 show_batch(out, title=[class_names[x] for x in classes])
 
 model, train_losses, val_losses = configure_run_model()
-display_losses(train_losses, val_losses,
-	       'Train-Val Loss: Method:' + mode)
+display_losses(train_losses, val_losses, 'Train-Val Loss')
 test_model(model)
-
-
-
 
