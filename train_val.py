@@ -99,11 +99,7 @@ def test_model(model):
 def configure_run_model():
 
     criterion = nn.CrossEntropyLoss()
-    model = get_model()
-    num_in_features_last = model.fc.in_features
-
-    # Newly constructed module has requires_grad=True by default
-    model.fc = nn.Linear(num_in_features_last, nb_classes)
+    model = get_model('resnet_ext', nb_classes)
 
     # Optimize all paramters
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
@@ -130,7 +126,9 @@ def get_args():
                         help="Batch size (will be split among devices used by this invocation)")
     parser.add_argument("--epochs", type=int, required=False, default=100,
                         help="Epochs")
-    parser.add_argument("--log-folder", type=str, required=False, default='logs',
+    parser.add_argument("--logs-folder", type=str, required=False, default='logs',
+                        help="Location of logs")
+    parser.add_argument("--plots-folder", type=str, required=False, default='plots',
                         help="Location of logs")
     parser.add_argument("--trained-models-folder", type=str, required=False,
                         default="trained_models",
@@ -139,8 +137,10 @@ def get_args():
     return parser.parse_args()
 
 args = get_args()
-if not os.path.exists(args.log_folder):
-    os.makedirs(args.log_folder)
+if not os.path.exists(args.logs_folder):
+    os.makedirs(args.logs_folder)
+if not os.path.exists(args.plots_folder):
+    os.makedirs(args.plots_folder)
 if not os.path.exists(args.trained_models_folder):
     os.makedirs(args.trained_models_folder)
 log_file = get_logfilename_with_datetime()
