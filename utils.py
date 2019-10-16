@@ -38,7 +38,7 @@ def show_batch(inp, title=None, folder='plots'):
     plt.imshow(inp)
     if title is not None:
         plt.title(title)
-        plt.savefig(join(folder, title + '.png'))
+        plt.savefig(join(folder, 'batch.png'))
 
 
 
