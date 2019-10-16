@@ -19,3 +19,6 @@ https://github.com/stratospark/food-101-keras/blob/master/food.py
 for eval, 
 try multicrop (10 crops and pick the highest occurring)
 multi-scale
+
+TODO
+plots go to file
