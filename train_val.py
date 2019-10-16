@@ -14,7 +14,6 @@ import torchvision
 import copy
 from utils import show_batch, load_data, display_losses
 from utils import get_logfilename_with_datetime
-from pudb import set_trace
 import argparse
 import logging
 import numpy as np
@@ -105,7 +104,6 @@ def configure_run_model():
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
 
     if multi_gpu:
-        set_trace()
         logging.info("Using {} GPUs.".format(torch.cuda.device_count()))
         model = torch.nn.DataParallel(model)
         # model = torch.nn.DataParallel(model, device_ids=[0,1,2])
@@ -113,7 +111,7 @@ def configure_run_model():
     model = model.to(device)
 
     # Decay learning rate by a factor of 0.1 every step_size epochs
-    exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
+    exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=100, gamma=0.1)
 
     model = train_val_model(model, criterion, optimizer, exp_lr_scheduler, args.epochs)
     return model
@@ -144,7 +142,7 @@ if not os.path.exists(args.plots_folder):
 if not os.path.exists(args.trained_models_folder):
     os.makedirs(args.trained_models_folder)
 log_file = get_logfilename_with_datetime()
-logging.basicConfig(filename=join(args.log_folder, log_file),
+logging.basicConfig(filename=join(args.logs_folder, log_file),
                     level=logging.INFO,
                     filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
