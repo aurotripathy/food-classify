@@ -5,6 +5,7 @@ import os
 import numpy as np
 import datetime
 from pudb import set_trace
+from os.path import join
 
 def display_losses(train_losses, val_losses, title, folder='plots'):
 
@@ -23,11 +24,11 @@ def display_losses(train_losses, val_losses, title, folder='plots'):
     ax.set(xlabel='Epochs', ylabel='Epoch Loss', title=title)
     ax.grid()
 
-    fig.savefig(os.path.join(folder, title + '.png'))
-    plt.show()
+    fig.savefig(join(folder, title + '.png'))
 
 
-def show_batch(inp, title=None):
+
+def show_batch(inp, title=None, folder='plots'):
     """Imshow for Tensor."""
     inp = inp.numpy().transpose((1, 2, 0))
     mean = np.array([0.485, 0.456, 0.406])
@@ -37,8 +38,8 @@ def show_batch(inp, title=None):
     plt.imshow(inp)
     if title is not None:
         plt.title(title)
-        plt.show()  # pause a bit so that plots are updated
-        plt.pause(1)  # pause a bit so that plots are updated
+        plt.savefig(join(folder, title + .'png'))
+
 
 
 def load_data(data_dir, batch_size):
