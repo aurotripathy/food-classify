@@ -106,12 +106,13 @@ def configure_run_model():
     if multi_gpu:
         logging.info("Using {} GPUs.".format(torch.cuda.device_count()))
         model = torch.nn.DataParallel(model)
-        # model = torch.nn.DataParallel(model, device_ids=[0,1,2])
 
     model = model.to(device)
 
-    # Decay learning rate by a factor of 0.1 every step_size epochs
-    exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=100, gamma=0.1)
+    # Decay learning rate by a factor every step_size epochs
+    exp_lr_scheduler = lr_scheduler.StepLR(optimizer,
+                                           step_size=args.lr_step_size,
+                                           gamma=args.lr_step_gamma)
 
     model = train_val_model(model, criterion, optimizer, exp_lr_scheduler, args.epochs)
     return model
@@ -124,6 +125,10 @@ def get_args():
                         help="Batch size (will be split among devices used by this invocation)")
     parser.add_argument("--epochs", type=int, required=False, default=100,
                         help="Epochs")
+    parser.add_argument("--lr-step-size" , type=int, required=False, default=30,
+                        help="Number of epochs after which the learning rate will decay")
+    parser.add_argument("--lr-step-gamma" , type=float, required=False, default=0.1,
+                        help="Factor of learn rate decay")    
     parser.add_argument("--logs-folder", type=str, required=False, default='logs',
                         help="Location of logs")
     parser.add_argument("--plots-folder", type=str, required=False, default='plots',
