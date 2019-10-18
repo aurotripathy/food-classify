@@ -49,7 +49,7 @@ class TwoInputsNet(torch.nn.Module):
   def __init__(self, nb_classes):
     super(TwoInputsNet, self).__init__()
     self.slice_branch = SliceBranch(3,320)
-    self.res50_model = models.resnet50(pretrained=True)
+    self.res50_model = models.resnet101(pretrained=True)
     self.res50_features = torch.nn.Sequential(*list(self.res50_model.children())[:-1])
     print('Trucncated Resnet\n', self.res50_features)
 
