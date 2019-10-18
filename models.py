@@ -4,13 +4,14 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 def get_model(model_name, nb_classes):
-        if model_name == 'resnet_std':
-                model = models.resnet101(pretrained=True)  # pretrained=True will download its weights
+        if model_name == 'resnet101':
+                # pretrained=True will download its weights
+                model = models.resnet101(pretrained=True)
                 num_in_features_last = model.fc.in_features
                 # Newly constructed module has requires_grad=True by default
                 model.fc = nn.Linear(num_in_features_last, nb_classes)
                 return model
-        elif model_name == 'resnet_ext':
+        elif model_name == 'resnet_plus_slice':
                 return ResnetPlusSlice(nb_classes, 0.5)
         else:
                 print('Error in model selection')
@@ -43,8 +44,8 @@ class SliceBranch(torch.nn.Module):
 class ResnetPlusSlice(torch.nn.Module):
   def __init__(self, nb_classes, drop_prob):
     super(ResnetPlusSlice, self).__init__()
-    self.slice_branch = SliceBranch(3,320)
-    self.res50_pretrained = models.resnet50(pretrained=True)
+    self.slice_branch = SliceBranch(3, 320)
+    self.res50_pretrained = models.resnet101(pretrained=True)
     self.res50_branch = torch.nn.Sequential(*list(self.res50_pretrained.children())[:-1])
 
     self.fc1 = torch.nn.Linear(2368, 2048)
