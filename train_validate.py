@@ -20,6 +20,7 @@ import numpy as np
 import os
 from os.path import join
 from models import get_model
+from test_model import test_model
 
 def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
 
@@ -78,21 +79,6 @@ def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
     model.load_state_dict(best_model_weights)  # retain best weights
     return model, train_epoch_losses, val_epoch_losses
 
-
-def test_model(model):
-
-    model.eval()
-    running_corrects = 0
-    with torch.no_grad():
-        for i, (inputs, labels) in enumerate(dataloaders['test']):
-            inputs = inputs.to(device)
-            labels = labels.to(device)
-
-            outputs = model(inputs)
-            _, predictions = torch.max(outputs, 1)  # predictions == argmax
-            running_corrects += torch.sum(predictions == labels.data)
-            acc = running_corrects.double() / dataset_sizes['test']
-        logging.info('Test accuracy: {:.4f}'.format(acc))
 
 
 def configure_run_model():
@@ -181,5 +167,5 @@ show_batch(out, title=[class_names[x] for x in classes])
 
 model, train_losses, val_losses = configure_run_model()
 display_losses(train_losses, val_losses, 'Train-Val Loss')
-test_model(model)
+test_model(model, dataloaders)
 
