@@ -11,13 +11,13 @@ def get_model(model_name, nb_classes):
                 model.fc = nn.Linear(num_in_features_last, nb_classes)
                 return model
         elif model_name == 'resnet_ext':
-                return TwoInputsNet(nb_classes)
+                return ResnetPlusSlice(nb_classes, 0.5)
         else:
                 print('Error in model selection')
                 exit(2)
 
 class SliceBranch(torch.nn.Module):
-    """ 2D convolution with three inputs, two outputs """ 
+    """ Describe slice branch from the paper """ 
     def __init__(self, input_size, output_size):
         super(SliceBranch, self).__init__()
         kernel_size = (224, 5)  # 
@@ -40,22 +40,24 @@ class SliceBranch(torch.nn.Module):
 
 
 
-class TwoInputsNet(torch.nn.Module):
-  def __init__(self, nb_classes):
-    super(TwoInputsNet, self).__init__()
+class ResnetPlusSlice(torch.nn.Module):
+  def __init__(self, nb_classes, drop_prob):
+    super(ResnetPlusSlice, self).__init__()
     self.slice_branch = SliceBranch(3,320)
-    self.res50_model = models.resnet50(pretrained=True)
-    self.res50_features = torch.nn.Sequential(*list(self.res50_model.children())[:-1])
+    self.res50_pretrained = models.resnet50(pretrained=True)
+    self.res50_branch = torch.nn.Sequential(*list(self.res50_pretrained.children())[:-1])
 
-    self.fc1 = torch.nn.Linear(2368, 2048)  
+    self.fc1 = torch.nn.Linear(2368, 2048)
+    self.dropout = nn.Dropout(p=drop_prob)
     self.fc2 = torch.nn.Linear(2048, nb_classes)  
 
   def forward(self, x):
     s_b = self.slice_branch(x)
-    resnet50 = self.res50_features(x)
-    out = torch.cat([s_b, resnet50], dim=1)    
+    r_b = self.res50_branch(x)
+    out = torch.cat([s_b, r_b], dim=1)    
     out = torch.flatten(out, 1)
     out = self.fc1(out)
+    out = self.dropout(out)
     out = self.fc2(out)
     return out
 
