@@ -15,3 +15,9 @@ def test_model(model, dataloaders):
             acc = running_corrects.double() / dataset_sizes['test']
         logging.info('Test accuracy: {:.4f}'.format(acc))
 
+def test_model_tencrop(model, dataloaders):
+    """
+    https://pytorch.org/docs/master/torchvision/transforms.html
+    use torchvision.transforms.TenCrop
+    """
+    pass
