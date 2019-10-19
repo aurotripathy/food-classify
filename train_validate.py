@@ -167,5 +167,5 @@ show_batch(out, title=[class_names[x] for x in classes])
 
 model, train_losses, val_losses = configure_run_model()
 display_losses(train_losses, val_losses, 'Train-Val Loss')
-test_model(model, dataloaders)
+test_model(model, dataloaders, device)
 
