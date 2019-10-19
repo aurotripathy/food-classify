@@ -1,7 +1,7 @@
 import torch
 import argparse
 from models import get_model
-from utils import load_data
+from utils import get_data_loaders
 import logging
 from os.path import join
 from pudb import set_trace
@@ -50,7 +50,7 @@ if __name__ == "__main__":
                     filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
     
-    dataloaders, dataset_sizes, class_names = load_data(args.train_data, args.batch_size)
+    dataloaders, dataset_sizes, class_names = get_data_loaders(args.train_data, args.batch_size)
     model = get_model('resnet_plus_slice', len(class_names))
     model = torch.nn.DataParallel(model)
     device = torch.device("cuda:0" if torch.cuda.is_available() else 'cpu')
