@@ -42,7 +42,7 @@ def show_batch(inp, title=None, folder='plots'):
 
 
 
-def load_data(data_dir, batch_size):
+def get_data_loaders(data_dir, batch_size):
     # For training, augment and normalize images
     # For validation/test, just normalize images
     data_transforms = {
