@@ -12,7 +12,7 @@ import torch.optim as optim
 from torch.optim import lr_scheduler
 import torchvision
 import copy
-from utils import show_batch, load_data, display_losses
+from utils import show_batch, get_data_loaders, display_losses
 from utils import get_logfilename_with_datetime
 import argparse
 import logging
@@ -141,7 +141,7 @@ logging.basicConfig(filename=join(args.logs_folder, log_file),
 print(args)
 logging.info(args)
 
-dataloaders, dataset_sizes, class_names = load_data(args.train_data, args.batch_size)
+dataloaders, dataset_sizes, class_names = get_data_loaders(args.train_data, args.batch_size)
 logging.info("Train size {}, Val size {}, Test size {}".format(dataset_sizes['train'],
                                                                dataset_sizes['val'],
                                                                dataset_sizes['test']))
