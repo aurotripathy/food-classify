@@ -14,7 +14,7 @@ As in the paper, we use the [Food-101](https://www.vision.ee.ethz.ch/datasets_ex
 
 Use the script [run_train.sh](https://github.com/aurotripathy/food-classify/blob/master/run_train.sh) to train the model. 
 
-#### Run a test regime
+#### Run a test cycle on the test data
 Use the script [run_test.sh](https://github.com/aurotripathy/food-classify/blob/master/run_test.sh) to test the model. 
 
 ### Inital results
