@@ -1,9 +1,9 @@
 import torch
 import argparse
 from models import get_model
-from utils import get_data_loaders, get_tencrop_data_loader
+from utils import get_data_loaders, get_tencrop_data_loader, get_logfilename_with_datetime
 import logging
-from os.path import join
+from os.path import join, exists
 from pudb import set_trace
 
 def test_model(model, dataloaders, device):
@@ -25,7 +25,7 @@ def test_model(model, dataloaders, device):
 def test_model_tencrop(model, dataloader, device):
     """
     https://pytorch.org/docs/master/torchvision/transforms.html
-    use torchvision.transforms.TenCrop
+    uses torchvision.transforms.TenCrop in the dataloader
     """
     model.eval()
     running_corrects = 0
@@ -51,15 +51,18 @@ def get_args():
                         help="Batch size (will be split among devices used by this invocation)")
     parser.add_argument("--model-file" , type=str, required=True, 
                         help="Full file path to the model")
+    parser.add_argument("--logs-folder", type=str, required=False, default='logs',
+                        help="Location of logs")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = get_args()
 
-    logs_folder = '.'
-    log_file = 'test_results.log'
-    logging.basicConfig(filename=join(logs_folder, log_file),
+    if not exists(args.logs_folder):
+        os.makedirs(args.logs_folder)
+    log_file = get_logfilename_with_datetime('test-log')
+    logging.basicConfig(filename=join(args.logs_folder, log_file),
                     level=logging.INFO,
                     filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
