@@ -3,6 +3,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+"""
+TODO
+https://pytorch.org/hub/pytorch_vision_wide_resnet/
+"""
+
 drop_prob = 0.5
 
 def get_model(model_name, nb_classes):
@@ -24,7 +29,7 @@ class SliceBranch(torch.nn.Module):
     def __init__(self, input_size, output_size):
         super(SliceBranch, self).__init__()
         kernel_size = (224, 5)  # 
-        self.conv = torch.nn.Conv2d(input_size,
+        self.wide_conv = torch.nn.Conv2d(input_size,
                                     output_size,
                                     kernel_size,
                                     stride=1,
@@ -34,7 +39,7 @@ class SliceBranch(torch.nn.Module):
         self.maxpool = torch.nn.MaxPool2d((1, 5))
         
     def forward(self, x):
-        out1 = F.relu(self.bn(self.conv(x)))
+        out1 = F.relu(self.bn(self.wide_conv(x)))
         out2 = self.maxpool(out1)
         out3 = self.maxpool(out2)
         out4 = self.maxpool(out3)
