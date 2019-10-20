@@ -1,7 +1,7 @@
 import torch
 import argparse
 from models import get_model
-from utils import get_data_loaders
+from utils import get_data_loaders, get_tencrop_data_loader
 import logging
 from os.path import join
 from pudb import set_trace
@@ -11,6 +11,7 @@ def test_model(model, dataloaders, device):
     model.eval()
     running_corrects = 0
     with torch.no_grad():
+        set_trace()
         for _, (inputs, labels) in enumerate(dataloaders['test']):
             inputs = inputs.to(device)
             labels = labels.to(device)
@@ -21,12 +22,25 @@ def test_model(model, dataloaders, device):
             acc = running_corrects.double() / dataset_sizes['test']
         logging.info('Test accuracy: {:.4f}'.format(acc))
 
-def test_model_tencrop(model, dataloaders, device):
+def test_model_tencrop(model, dataloader, device):
     """
     https://pytorch.org/docs/master/torchvision/transforms.html
     use torchvision.transforms.TenCrop
     """
-    pass
+    model.eval()
+    running_corrects = 0
+    with torch.no_grad():
+        set_trace()
+        for _, (inputs, labels) in enumerate(dataloader['test']):
+            inputs = inputs.to(device)
+            labels = labels.to(device)
+            bs, ncrops, c, h, w = inputs.size()
+            result = model(inputs.view(-1, c, h, w)) # fuse batch size and ncrops
+            result_avg = result.view(bs, ncrops, -1).mean(1) # avg over crops            
+            _, predictions = torch.max(result_avg, 1)  # predictions == argmax
+            running_corrects += torch.sum(predictions == labels.data)
+            acc = running_corrects.double() / dataset_sizes['test']
+        logging.info('Test accuracy: {:.4f}'.format(acc))
 
 
 def get_args():
@@ -50,7 +64,8 @@ if __name__ == "__main__":
                     filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
     
-    dataloaders, dataset_sizes, class_names = get_data_loaders(args.train_data, args.batch_size)
+    dataloader, dataset_sizes, class_names = get_tencrop_data_loader(args.train_data, args.batch_size)
+    # dataloaders, dataset_sizes, class_names = get_data_loaders(args.train_data, args.batch_size)
     model = get_model('resnet_plus_slice', len(class_names))
     model = torch.nn.DataParallel(model)
     device = torch.device("cuda:0" if torch.cuda.is_available() else 'cpu')
@@ -58,5 +73,5 @@ if __name__ == "__main__":
     model.load_state_dict(torch.load(args.model_file))
     print(device)
     print("Test size: {} images".format(dataset_sizes['test'],))
-    set_trace()
-    test_model(model, dataloaders, device)
+    test_model_tencrop(model, dataloader, device)
+    # test_model(model, dataloaders, device)
