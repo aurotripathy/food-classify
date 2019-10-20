@@ -99,8 +99,10 @@ def get_tencrop_data_loader(data_dir, batch_size):
 	'test': transforms.Compose([
             transforms.Resize(256),
             transforms.TenCrop(224), # this is a list of PIL Images
-            transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])), # returns a 4D tensor
-            transforms.Lambda(lambda crops: torch.stack([normalize(crop) for crop in crops])),
+            transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop)
+                                                         for crop in crops])), # returns a 4D tensor
+            transforms.Lambda(lambda crops: torch.stack([normalize(crop)
+                                                         for crop in crops])),
 	]),
     }
     
@@ -117,8 +119,8 @@ def get_tencrop_data_loader(data_dir, batch_size):
 
 
 
-def get_logfilename_with_datetime():
+def get_logfilename_with_datetime(prefix):
     # Use current date/time (upto minute) to get a text file name.
-    return "train_log-" + \
+    return prefix + "-" + \
         str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M")) + \
         ".log"
