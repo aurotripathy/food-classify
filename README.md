@@ -1,12 +1,15 @@
 # food-classify
 
-This repo is an attempt to reproduce the results of the paper Wide-Slice [Residual Networks for Food Recognition](https://arxiv.org/pdf/1612.06543.pdf).
+This repo is an attempt to reproduce the results of the paper [Wide-Slice Residual Networks for Food Recognition](https://arxiv.org/pdf/1612.06543.pdf).
 
+#### Download the Dataset
+We use the [Food-101](https://www.vision.ee.ethz.ch/datasets_extra/food-101/) Dataset. You can trigger the download directly from [here](http://data.vision.ee.ethz.ch/cvl/food-101.tar.gz).  Untar it once download is complete.
 
-sudo docker run -it --network=host --shm-size=20G --device=/dev/kfd --device=/dev/dri --group-add video -v $HOME/food-101:/food-101 computecqe/pytorch:rocm27-RC4-22-ub1604-py3.6_food
+#### Build the train/validate/test partitions from the dataset
+<code>
+  python build_dataset.py --root-folder path/to/untarred/location
+ </code>
 
-#### First, build the dataset
-python build_dataset.py --root-folder /media/auro/RAID\ 5/food-101/food-101
+#### Run a training regime
 
-#### Then run the training regime
-python train_val.py --batch-size 75 --epochs 15 --train-data /media/auro/RAID\ 5/food-101/food-101/train_val_test
+#### Run a test regime
