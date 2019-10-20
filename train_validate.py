@@ -84,7 +84,7 @@ def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
 def configure_run_model():
 
     criterion = nn.CrossEntropyLoss()
-    model = get_model('resnet_plus_slice', nb_classes)
+    model = get_model('wide_resnet_plus_slice', nb_classes)
 
     # Optimize all paramters
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
