@@ -20,6 +20,8 @@ def get_model(model_name, nb_classes):
                 return model
         elif model_name == 'resnet_plus_slice':
                 return Resnet101PlusSlice(nb_classes, drop_prob)
+        elif model_name == 'wide_resnet_plus_slice':
+                return WideResnet101PlusSlice(nb_classes, drop_prob)
         else:
                 print('Error in model selection')
                 exit(2)
@@ -50,10 +52,34 @@ class SliceBranch(torch.nn.Module):
 
 class Resnet101PlusSlice(torch.nn.Module):
   def __init__(self, nb_classes, drop_prob):
-    super(ResnetPlusSlice, self).__init__()
+    super(Resnet101PlusSlice, self).__init__()
     self.slice_branch = SliceBranch(3, 320)
     self.res101_pretrained = models.resnet101(pretrained=True)
     self.res101_branch = torch.nn.Sequential(*list(self.res101_pretrained.children())[:-1])
+
+    self.fc1 = torch.nn.Linear(2368, 2048)
+    self.dropout = nn.Dropout(p=drop_prob)
+    self.fc2 = torch.nn.Linear(2048, nb_classes)  
+
+  def forward(self, x):
+    s_b = self.slice_branch(x)
+    r_b = self.res101_branch(x)
+    out = torch.cat([s_b, r_b], dim=1)    
+    out = torch.flatten(out, 1)
+    out = self.fc1(out)
+    out = self.dropout(out)
+    out = self.fc2(out)
+    return out
+
+class WideResnet101PlusSlice(torch.nn.Module):
+  def __init__(self, nb_classes, drop_prob):
+    super(WideResnet101PlusSlice, self).__init__()
+    self.slice_branch = SliceBranch(3, 320)
+    self.wide_res101_pretrained = torch.hub.load('pytorch/vision',
+                                                 'wide_resnet101_2',
+                                                 pretrained=True)
+    self.res101_branch = torch.nn.Sequential(
+            *list(self.wide_res101_pretrained.children())[:-1])
 
     self.fc1 = torch.nn.Linear(2368, 2048)
     self.dropout = nn.Dropout(p=drop_prob)
