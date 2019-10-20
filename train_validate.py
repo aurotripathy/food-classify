@@ -132,7 +132,7 @@ if not os.path.exists(args.plots_folder):
     os.makedirs(args.plots_folder)
 if not os.path.exists(args.trained_models_folder):
     os.makedirs(args.trained_models_folder)
-log_file = get_logfilename_with_datetime()
+log_file = get_logfilename_with_datetime('train-log')
 logging.basicConfig(filename=join(args.logs_folder, log_file),
                     level=logging.INFO,
                     filemode='w', format='%(name)s - %(levelname)s - %(message)s')
