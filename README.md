@@ -17,6 +17,15 @@ Use the script [run_train.sh](https://github.com/aurotripathy/food-classify/blob
 #### Run a test regime
 Use the script [run_test.sh](https://github.com/aurotripathy/food-classify/blob/master/run_test.sh) to test the model. 
 
-#### Inital results
+### Inital results
 
-https://github.com/aurotripathy/food-classify/blob/master/plots/Train-Val%20Loss.png
+##### Validation Accuray (0.8465)
+
+[train log](https://github.com/aurotripathy/food-classify/blob/master/logs/train-log-2019-10-19%2023:43.log)
+
+##### Ten-crop Test Accuracy (0.8471)
+
+[test log](https://github.com/aurotripathy/food-classify/blob/master/logs/test-log-2019-10-20%2011:41.log)
+
+##### Loss Plot
+![Loss Plot](https://github.com/aurotripathy/food-classify/blob/master/plots/Train-Val%20Loss.png)
