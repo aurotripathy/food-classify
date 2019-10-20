@@ -3,6 +3,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+drop_prob = 0.5
+
 def get_model(model_name, nb_classes):
         if model_name == 'resnet101':
                 # pretrained=True will download its weights
@@ -12,7 +14,7 @@ def get_model(model_name, nb_classes):
                 model.fc = nn.Linear(num_in_features_last, nb_classes)
                 return model
         elif model_name == 'resnet_plus_slice':
-                return ResnetPlusSlice(nb_classes, 0.5)
+                return Resnet101PlusSlice(nb_classes, drop_prob)
         else:
                 print('Error in model selection')
                 exit(2)
@@ -41,12 +43,12 @@ class SliceBranch(torch.nn.Module):
 
 
 
-class ResnetPlusSlice(torch.nn.Module):
+class Resnet101PlusSlice(torch.nn.Module):
   def __init__(self, nb_classes, drop_prob):
     super(ResnetPlusSlice, self).__init__()
     self.slice_branch = SliceBranch(3, 320)
-    self.res50_pretrained = models.resnet101(pretrained=True)
-    self.res50_branch = torch.nn.Sequential(*list(self.res50_pretrained.children())[:-1])
+    self.res101_pretrained = models.resnet101(pretrained=True)
+    self.res101_branch = torch.nn.Sequential(*list(self.res101_pretrained.children())[:-1])
 
     self.fc1 = torch.nn.Linear(2368, 2048)
     self.dropout = nn.Dropout(p=drop_prob)
@@ -54,7 +56,7 @@ class ResnetPlusSlice(torch.nn.Module):
 
   def forward(self, x):
     s_b = self.slice_branch(x)
-    r_b = self.res50_branch(x)
+    r_b = self.res101_branch(x)
     out = torch.cat([s_b, r_b], dim=1)    
     out = torch.flatten(out, 1)
     out = self.fc1(out)
