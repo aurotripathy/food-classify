@@ -135,7 +135,9 @@ if not os.path.exists(args.trained_models_folder):
 log_file = get_logfilename_with_datetime('train-log')
 logging.basicConfig(filename=join(args.logs_folder, log_file),
                     level=logging.INFO,
-                    filemode='w', format='%(name)s - %(levelname)s - %(message)s')
+                    filemode='w',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 print(args)
