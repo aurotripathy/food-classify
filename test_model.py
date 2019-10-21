@@ -45,8 +45,8 @@ def test_model_tencrop(model, dataloader, device):
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--train-data" , type=str, required=True, 
-                        help="Path to the training data (in PyTorch ImageFolder format)")
+    parser.add_argument("--test-data" , type=str, required=True, 
+                        help="Path to the test data (in PyTorch ImageFolder format). Uses only the test folder")
     parser.add_argument("--batch-size" , type=int, required=False, default=64,
                         help="Batch size (will be split among devices used by this invocation)")
     parser.add_argument("--model-file" , type=str, required=True, 
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     
     dataloader, dataset_sizes, class_names = get_tencrop_data_loader(args.train_data, args.batch_size)
     # dataloaders, dataset_sizes, class_names = get_data_loaders(args.train_data, args.batch_size)
-    model = get_model('resnet_plus_slice', len(class_names))
+    model = get_model('wide_resnet_plus_slice', len(class_names))
     model = torch.nn.DataParallel(model)
     device = torch.device("cuda:0" if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
