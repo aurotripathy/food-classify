@@ -46,7 +46,7 @@ def test_model_tencrop(model, dataloader, device):
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--test-data" , type=str, required=True, 
-                        help="Path to the test data (in PyTorch ImageFolder format). Uses only the test folder")
+                        help="Path to the train/val/test folder (in PyTorch ImageFolder format). Uses only the test folder")
     parser.add_argument("--batch-size" , type=int, required=False, default=64,
                         help="Batch size (will be split among devices used by this invocation)")
     parser.add_argument("--model-file" , type=str, required=True, 
