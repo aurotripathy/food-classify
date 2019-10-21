@@ -1,6 +1,6 @@
 # food-classify
 
-This repo is an attempt to reproduce the results of the paper [Wide-Slice Residual Networks for Food Recognition](https://arxiv.org/pdf/1612.06543.pdf) using the PyTorch framework.
+This repo is my attempt to reproduce the results of the paper [Wide-Slice Residual Networks for Food Recognition](https://arxiv.org/pdf/1612.06543.pdf) using the PyTorch framework.
 
 #### Download the Dataset
 As in the paper, we use the [Food-101](https://www.vision.ee.ethz.ch/datasets_extra/food-101/) Dataset. You can trigger the download directly from [here](http://data.vision.ee.ethz.ch/cvl/food-101.tar.gz).  Untar it once download is complete.
