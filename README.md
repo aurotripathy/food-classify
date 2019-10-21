@@ -25,7 +25,7 @@ Use the script [run_test.sh](https://github.com/aurotripathy/food-classify/blob/
 
 ##### Ten-crop Test Accuracy (0.8615)
 
-[test log](https://github.com/aurotripathy/food-classify/blob/master/logs/test-log-2019-10-20%2011:41.log)
+[test log](https://github.com/aurotripathy/food-classify/blob/master/logs/test-log-2019-10-21%2007:15.log)
 
 ##### Loss Plot
 ![Loss Plot](https://github.com/aurotripathy/food-classify/blob/master/plots/Train-Val%20Loss.png)
