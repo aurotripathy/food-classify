@@ -19,11 +19,11 @@ Use the script [run_test.sh](https://github.com/aurotripathy/food-classify/blob/
 
 ### Inital results
 
-##### Validation Accuray (0.8465)
+##### Validation Accuray (0.8560)
 
 [train log](https://github.com/aurotripathy/food-classify/blob/master/logs/train-log-2019-10-19%2023:43.log)
 
-##### Ten-crop Test Accuracy (0.8471)
+##### Ten-crop Test Accuracy (0.8615)
 
 [test log](https://github.com/aurotripathy/food-classify/blob/master/logs/test-log-2019-10-20%2011:41.log)
 
