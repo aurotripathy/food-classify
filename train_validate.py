@@ -73,7 +73,7 @@ def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
                 torch.save(best_model_weights, join(args.trained_models_folder, 'checkpoint.pth'))
 
             if phase == 'train':
-                scheduler.step()
+                scheduler.step()  # called every epoch
 
     logging.info('Best validation accuracy: {:4f}'.format(best_accuracy))
     model.load_state_dict(best_model_weights)  # retain best weights
