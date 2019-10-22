@@ -35,3 +35,12 @@ STEP 7: INSTANTIATE STEP LEARNING SCHEDULER CLASS
 # factor = decaying factor
 scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.1, patience=0, verbose=True)
 
+
+to change lr per the paper after x namy steps
+https://stackoverflow.com/questions/48324152/pytorch-how-to-change-the-learning-rate-of-an-optimizer-at-any-given-moment-no
+
+
+use the train-test split of the daatset (instead of your own)
+
+diff between learning-rate decay and weight decay
+https://discuss.pytorch.org/t/how-does-sgd-weight-decay-work/33105/2
