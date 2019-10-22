@@ -19,3 +19,19 @@ https://github.com/stratospark/food-101-keras/blob/master/food.py
 test 
  - multi-scale
 
+
+at 0.86 Hoorray!!
+
+- try nesterov momemtum
+optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9, nesterov=True)
+
+
+STEP 7: INSTANTIATE STEP LEARNING SCHEDULER CLASS
+'''
+# lr = lr * factor 
+# mode='max': look for the maximum validation accuracy to track
+# patience: number of epochs - 1 where loss plateaus before decreasing LR
+        # patience = 0, after 1 bad epoch, reduce LR
+# factor = decaying factor
+scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.1, patience=0, verbose=True)
+
