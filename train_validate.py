@@ -22,15 +22,35 @@ from os.path import join
 from models import get_model
 from test_model import test_model
 
-def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
+def maybe_update_lr(step, optimizer):
+    if step > 90000:
+        lr = 0.0004
+    elif step > 50000:
+        lr = 0.002
+    elif step > 0:
+        lr = 0.01
+    for g in optimizer.param_groups:
+        g['lr'] = lr
+    return lr, optimizer
+    
+    
+
+def train_val_model(model, criterion, optimizer, scheduler, max_steps=100000):
 
     best_model_weights = copy.deepcopy(model.state_dict())
     best_accuracy = 0.0
     train_epoch_losses = []
     val_epoch_losses = []
-    for epoch in range(num_epochs):
-        logging.info('\nEpoch {}/{}'.format(epoch, num_epochs - 1))
+    total_steps = 0
+    epochs = 0
+    while True:
+        if total_steps > max_steps:
+            break
+        epochs += 1
+        logging.info('\nEpoch # {}'.format(epochs))
         logging.info('Learning rate {}'.format(scheduler.get_lr()))
+
+        steps_per_epoch = 0
         
         for phase in ['train', 'val']:  # each epoch does train and validate
             model.train() if phase == 'train' else model.eval()
@@ -40,6 +60,8 @@ def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
 
             # Iterate over mini-batches
             for inputs, labels in dataloaders[phase]:
+                if phase == 'train':
+                    steps_per_epoch += 1
                 inputs = inputs.to(device)
                 labels = labels.to(device)
 
@@ -64,6 +86,10 @@ def train_val_model(model, criterion, optimizer, scheduler, num_epochs=15):
                 train_epoch_losses.append(epoch_loss)
             else:
                 val_epoch_losses.append(epoch_loss)
+                
+            logging.info('Steps per train epoch: {}'.format(steps_per_epoch))
+            total_steps += steps_per_epoch
+            lr, optimizer =  maybe_update_lr(total_steps, optimizer)
             logging.info('\t{} loss: {:.4f}, {} accuracy: {:.4f}'.format(
                 phase, epoch_loss, phase, epoch_accuracy))
 
@@ -100,7 +126,7 @@ def configure_run_model():
                                            step_size=args.lr_step_size,
                                            gamma=args.lr_step_gamma)
 
-    model = train_val_model(model, criterion, optimizer, exp_lr_scheduler, args.epochs)
+    model = train_val_model(model, criterion, optimizer, exp_lr_scheduler, args.max_steps)
     return model
 
 def get_args():
@@ -109,7 +135,7 @@ def get_args():
                         help="Path to the training data (in PyTorch ImageFolder format)")
     parser.add_argument("--batch-size" , type=int, required=False, default=64,
                         help="Batch size (will be split among devices used by this invocation)")
-    parser.add_argument("--epochs", type=int, required=False, default=100,
+    parser.add_argument("--max-steps", type=int, required=False, default=100000,
                         help="Epochs")
     parser.add_argument("--lr-step-size" , type=int, required=False, default=30,
                         help="Number of epochs after which the learning rate will decay")
