@@ -2,6 +2,14 @@
 Fine-tune from ResNet101 ImageNet weights:
 (1) learn the fully-connected layer from scratch
 (2) optionally fine-tune the rest of the layers
+
+Applying the hyperparameters from the paper:
+Model training was performed: 
+- ia stochastic gradient descent with mini-batches containing 24 sam-ples. 
+- The initial learning rate has been set to 0.01, 
+  then up-dated to 0.002 and 0.0004, after 50k and 90k iterations re-spectively. 
+- Momentum has been set to 0.9 and a weight de-cay penalty of 0.0005 had been applied to all layers. 
+- Training has been stopped after100k iterations.  
 """
 from __future__ import print_function, division
 
@@ -22,7 +30,9 @@ from os.path import join
 from models import get_model
 from test_model import test_model
 
-def maybe_update_lr(step, optimizer):
+
+def maybe_update_lr(step, optimizer, lr):
+    """Change lr at 50k and 90k"""
     if step > 90000:
         lr = 0.0004
     elif step > 50000:
@@ -31,11 +41,10 @@ def maybe_update_lr(step, optimizer):
         lr = 0.01
     for g in optimizer.param_groups:
         g['lr'] = lr
-    return optimizer
-    
+    return lr, optimizer
     
 
-def train_val_model(model, criterion, optimizer, scheduler, max_steps=100000):
+def train_val_model(model, criterion, optimizer, max_steps=100000):
 
     best_model_weights = copy.deepcopy(model.state_dict())
     best_accuracy = 0.0
@@ -43,12 +52,13 @@ def train_val_model(model, criterion, optimizer, scheduler, max_steps=100000):
     val_epoch_losses = []
     total_steps = 0
     epochs = 0
+    lr = args.initial_lr
     while True:
         if total_steps > max_steps:
             break
         epochs += 1
-        logging.info('\nEpoch # {}'.format(epochs))
-        logging.info('Learning rate {}'.format(scheduler.get_lr()))
+        logging.info('Epoch # {}, total steps: {}'.format(epochs, total_steps))
+        logging.info('Learning rate {}'.format(lr))
 
         steps_per_epoch = 0
         
@@ -86,10 +96,10 @@ def train_val_model(model, criterion, optimizer, scheduler, max_steps=100000):
                 train_epoch_losses.append(epoch_loss)
             else:
                 val_epoch_losses.append(epoch_loss)
-                
-            logging.info('Steps per train epoch: {}'.format(steps_per_epoch))
+
+                logging.info('Steps per train epoch: {}'.format(steps_per_epoch))
             total_steps += steps_per_epoch
-            optimizer =  maybe_update_lr(total_steps, optimizer)
+            lr, optimizer = maybe_update_lr(total_steps, optimizer, lr)
             logging.info('\t{} loss: {:.4f}, {} accuracy: {:.4f}'.format(
                 phase, epoch_loss, phase, epoch_accuracy))
 
@@ -98,13 +108,10 @@ def train_val_model(model, criterion, optimizer, scheduler, max_steps=100000):
                 best_model_weights = copy.deepcopy(model.state_dict())
                 torch.save(best_model_weights, join(args.trained_models_folder, 'checkpoint.pth'))
 
-            if phase == 'train':
-                scheduler.step()  # called every epoch
 
     logging.info('Best validation accuracy: {:4f}'.format(best_accuracy))
     model.load_state_dict(best_model_weights)  # retain best weights
     return model, train_epoch_losses, val_epoch_losses
-
 
 
 def configure_run_model():
@@ -113,7 +120,8 @@ def configure_run_model():
     model = get_model('wide_resnet_plus_slice', nb_classes)
 
     # Optimize all paramters
-    optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+    optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9,
+                          weight_decay=args.weight_decay)
 
     if multi_gpu:
         logging.info("Using {} GPUs.".format(torch.cuda.device_count()))
@@ -121,12 +129,7 @@ def configure_run_model():
 
     model = model.to(device)
 
-    # Decay learning rate by a factor every step_size epochs
-    exp_lr_scheduler = lr_scheduler.StepLR(optimizer,
-                                           step_size=args.lr_step_size,
-                                           gamma=args.lr_step_gamma)
-
-    model = train_val_model(model, criterion, optimizer, exp_lr_scheduler, args.max_steps)
+    model = train_val_model(model, criterion, optimizer, args.max_steps)
     return model
 
 def get_args():
@@ -135,12 +138,12 @@ def get_args():
                         help="Path to the training data (in PyTorch ImageFolder format)")
     parser.add_argument("--batch-size" , type=int, required=False, default=64,
                         help="Batch size (will be split among devices used by this invocation)")
+    parser.add_argument("--initial-lr" , type=float, required=False, default=0.01,
+                        help="Initial learning rate")
+    parser.add_argument("--weight-decay" , type=float, required=False, default=0.0005,
+                        help="L2 penalty")
     parser.add_argument("--max-steps", type=int, required=False, default=100000,
                         help="Epochs")
-    parser.add_argument("--lr-step-size" , type=int, required=False, default=30,
-                        help="Number of epochs after which the learning rate will decay")
-    parser.add_argument("--lr-step-gamma" , type=float, required=False, default=0.1,
-                        help="Factor of learn rate decay")    
     parser.add_argument("--logs-folder", type=str, required=False, default='logs',
                         help="Location of logs")
     parser.add_argument("--plots-folder", type=str, required=False, default='plots',
