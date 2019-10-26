@@ -31,7 +31,7 @@ def maybe_update_lr(step, optimizer):
         lr = 0.01
     for g in optimizer.param_groups:
         g['lr'] = lr
-    return lr, optimizer
+    return optimizer
     
     
 
@@ -89,7 +89,7 @@ def train_val_model(model, criterion, optimizer, scheduler, max_steps=100000):
                 
             logging.info('Steps per train epoch: {}'.format(steps_per_epoch))
             total_steps += steps_per_epoch
-            lr, optimizer =  maybe_update_lr(total_steps, optimizer)
+            optimizer =  maybe_update_lr(total_steps, optimizer)
             logging.info('\t{} loss: {:.4f}, {} accuracy: {:.4f}'.format(
                 phase, epoch_loss, phase, epoch_accuracy))
 
