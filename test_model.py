@@ -67,7 +67,7 @@ if __name__ == "__main__":
                     filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
     
-    dataloader, dataset_sizes, class_names = get_tencrop_data_loader(args.train_data, args.batch_size)
+    dataloader, dataset_sizes, class_names = get_tencrop_data_loader(args.test_data, args.batch_size)
     # dataloaders, dataset_sizes, class_names = get_data_loaders(args.train_data, args.batch_size)
     model = get_model('wide_resnet_plus_slice', len(class_names))
     model = torch.nn.DataParallel(model)
